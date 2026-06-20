@@ -21,9 +21,16 @@ struct ContentView: View {
         Memory(title: "Apple Park", coordinate:CLLocationCoordinate2D(latitude: 37.3346, longitude: -122.0090))
     ]
     var body: some View {
-        Map(position: $position){
-            ForEach(memories){ memory in
-                Marker(memory.title,coordinate: memory.coordinate)
+        MapReader{ reader in
+            Map(position: $position){
+                ForEach(memories){ memory in
+                    Marker(memory.title,coordinate: memory.coordinate)
+                }
+            }.onTapGesture(coordinateSpace: .local) { location in
+                if let coordinate = reader.convert(location, from: .local){
+                    let newMemory = Memory(title: "New Memory", coordinate: coordinate)
+                    memories.append(newMemory)
+                }
             }
         }.ignoresSafeArea()
     }
