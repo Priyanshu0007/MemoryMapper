@@ -6,16 +6,26 @@
 //
 
 import SwiftUI
+import MapKit
+import CoreLocation
+
+struct Memory: Identifiable{
+    let id = UUID()
+    let title: String
+    let coordinate: CLLocationCoordinate2D
+}
 
 struct ContentView: View {
+    @State private var position: MapCameraPosition = .automatic;
+    @State private var memories: [Memory] = [
+        Memory(title: "Apple Park", coordinate:CLLocationCoordinate2D(latitude: 37.3346, longitude: -122.0090))
+    ]
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        Map(position: $position){
+            ForEach(memories){ memory in
+                Marker(memory.title,coordinate: memory.coordinate)
+            }
+        }.ignoresSafeArea()
     }
 }
 
