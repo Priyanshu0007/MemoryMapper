@@ -8,22 +8,16 @@
 import SwiftUI
 import MapKit
 import CoreLocation
-
-struct Memory: Identifiable{
-    let id = UUID()
-    let title: String
-    let coordinate: CLLocationCoordinate2D
-}
+import SwiftData
 
 struct ContentView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query private var memories:[Memory]
     @State private var isShowingSheet: Bool = false;
     @State private var tempCoordinate: CLLocationCoordinate2D?
     @State private var newMemoryTitle: String = ""
     
-    @State private var position: MapCameraPosition = .automatic;
-    @State private var memories: [Memory] = [
-        Memory(title: "Zaika", coordinate:CLLocationCoordinate2D(latitude: 28.4164, longitude: 77.0368))
-    ]
+    @State private var position: MapCameraPosition = .camera(MapCamera(centerCoordinate: CLLocationCoordinate2D(latitude: 28.4164, longitude: 77.0368), distance: 5000))
     var body: some View {
         MapReader{ reader in
             Map(position: $position){
@@ -48,8 +42,8 @@ struct ContentView: View {
                 Button("Save Marker"){
                     if let coordinate = tempCoordinate{
                         let newMemory = Memory(title: newMemoryTitle, coordinate: coordinate)
-                        memories.append(newMemory)
-                        isShowingSheet = false
+                            modelContext.insert(newMemory)
+                            isShowingSheet = false
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -62,4 +56,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .modelContainer(for: Memory.self, inMemory: true)
 }
